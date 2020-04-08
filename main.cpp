@@ -17,8 +17,37 @@ Serial UART(SERIAL_TX, SERIAL_RX);
 
 int arrivedcount = 0;
 
+void update_temp(uint8_t*  number){
+    BSP_LCD_SetFont(&Font20);
+    BSP_LCD_ClearStringLine(2);
+    BSP_LCD_ClearStringLine(3);
+    BSP_LCD_DisplayStringAtLine(3, (uint8_t*) number);
+    BSP_LCD_DrawCircle(33, 53, 2);
+    BSP_LCD_SetFont(&Font24);
+    BSP_LCD_DisplayStringAt(29, 56, (uint8_t*) " C", LEFT_MODE);
+
+}
+
+void touchscreen_display(){
+    BSP_LCD_Clear(LCD_COLOR_WHITE);
+
+    /* Set Touchscreen Demo1 description */
+    // BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
+    BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 100); 
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    BSP_LCD_SetBackColor(LCD_COLOR_BLACK); 
+    BSP_LCD_SetFont(&Font16);
+    BSP_LCD_DisplayStringAt(0, 15, (uint8_t *)"A/C Simulator", CENTER_MODE);
+    BSP_LCD_SetFont(&Font12);
+    BSP_LCD_ClearStringLine(4);
+    BSP_LCD_DisplayStringAtLine(4, (uint8_t*) "TEMP_NOT_SET");
+    // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "TEMP_NOT_SET", LEFT_MODE);
+    // BSP_LCD_DrawCircle(29, 50, 2);
+}
 
 void get_the_payload(char payload[]){
+
+    // printf("PAYLOAD : %s\n", payload);
     
     //CONVERT TO LOWER CASE
     for(int i=0; payload[i]; i++){
@@ -32,6 +61,18 @@ void get_the_payload(char payload[]){
     char COOL[] = "cool";
     char DRY[] = "dry";
 
+    char TWENTY[] = "20";
+    char TWENTY_ONE[] = "21";
+    char TWENTY_TWO[] = "22";
+    char TWENTY_THREE[] = "23";
+    char TWENTY_FOUR[] = "24";
+    char TWENTY_FIVE[] = "25";
+    char TWENTY_SIX[] = "26";
+    char TWENTY_SEVEN[] = "27";
+    char TWENTY_EIGHT[] = "28";
+    char TWENTY_NINE[] = "29";
+    char THIRTY[] = "30";
+
 
     //STRSTR_VARABLE
     char *ON_STRSTR;
@@ -39,7 +80,20 @@ void get_the_payload(char payload[]){
     char *AUTO_STRSTR;
     char *COOL_STRSTR;
     char *DRY_STRSTR;
-    
+
+    char *TWENTY_STRSTR;
+    char *TWENTY_STRTSTR;
+    char *TWENTY_ONE_STRSTR;
+    char *TWENTY_TWO_STRSTR;
+    char *TWENTY_THREE_STRSTR;
+    char *TWENTY_FOUR_STRSTR;
+    char *TWENTY_FIVE_STRSTR;
+    char *TWENTY_SIX_STRSTR;
+    char *TWENTY_SEVEN_STRSTR;
+    char *TWENTY_EIGHT_STRSTR;
+    char *TWENTY_NINE_STRSTR;
+    char *THIRTY_STRSTR;
+
     //STRSTR
     ON_STRSTR = strstr(payload, ON);
     OFF_STRSTR = strstr(payload, OFF);
@@ -47,10 +101,22 @@ void get_the_payload(char payload[]){
     COOL_STRSTR = strstr(payload, COOL);
     DRY_STRSTR = strstr(payload, DRY);
 
+    TWENTY_STRSTR = strstr(payload, TWENTY);
+    TWENTY_ONE_STRSTR = strstr(payload, TWENTY_ONE);
+    TWENTY_TWO_STRSTR = strstr(payload, TWENTY_TWO);
+    TWENTY_THREE_STRSTR = strstr(payload, TWENTY_THREE);
+    TWENTY_FOUR_STRSTR = strstr(payload, TWENTY_FOUR);
+    TWENTY_FIVE_STRSTR = strstr(payload, TWENTY_FIVE);
+    TWENTY_SIX_STRSTR = strstr(payload, TWENTY_SIX);
+    TWENTY_SEVEN_STRSTR = strstr(payload, TWENTY_SEVEN);
+    TWENTY_EIGHT_STRSTR = strstr(payload, TWENTY_EIGHT);
+    TWENTY_NINE_STRSTR = strstr(payload, TWENTY_NINE);
+    THIRTY_STRSTR = strstr(payload, THIRTY);
+
+
     //CHECK_PRESSED_BUTTON
     if(ON_STRSTR){
         printf("You press ON\n");
-        
     }
 
     else if(OFF_STRSTR){
@@ -69,23 +135,98 @@ void get_the_payload(char payload[]){
         printf("You press DRY\n");
     }
 
+    else if(TWENTY_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_ClearStringLine(4);
+        // BSP_LCD_DisplayStringAtLine(4, (uint8_t*) "20");
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "20");
+        printf("You press 20\n");
+    }
+
+    else if(TWENTY_ONE_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "21 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "21");
+        printf("You press 21\n");
+    }
+
+    else if(TWENTY_TWO_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "22 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "22");
+        printf("You press 22\n");
+    }
+
+    else if(TWENTY_THREE_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "23 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "23");
+        printf("You press 23\n");
+    }
+
+    else if(TWENTY_FOUR_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "24 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "24");
+        printf("You press 24\n");
+    }
+
+    else if(TWENTY_FIVE_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "25 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "25");
+        printf("You press 25\n");
+    }
+
+    else if(TWENTY_SIX_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "26 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "26");
+        printf("You press 26\n");
+    }
+
+    else if(TWENTY_SEVEN_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "27");
+        printf("You press 27\n");
+    }
+
+    else if(TWENTY_EIGHT_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "28");
+        printf("You press 28\n");
+    }
+
+    else if(TWENTY_NINE_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "29");
+        printf("You press 29\n");
+    }
+
+    else if(THIRTY_STRSTR){
+        // BSP_LCD_SetFont(&Font16);
+        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
+        // BSP_LCD_DrawCircle(29, 50, 2);
+        update_temp((uint8_t *) "30");
+        printf("You press 30\n");
+    }
+
     else {
         printf("MAI JER\n");
     }
-}
-
-void touchscreen_display(){
-    BSP_LCD_Clear(LCD_COLOR_WHITE);
-
-    /* Set Touchscreen Demo1 description */
-    // BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-    BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 100); 
-    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
-    BSP_LCD_SetBackColor(LCD_COLOR_BLACK); 
-    BSP_LCD_SetFont(&Font16);
-    BSP_LCD_DisplayStringAt(0, 15, (uint8_t *)"A/C Simulator", CENTER_MODE);
-    BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "26 C", LEFT_MODE);
-    BSP_LCD_DrawCircle(29, 50, 2);
 }
 
 // callback for subscribe topic
