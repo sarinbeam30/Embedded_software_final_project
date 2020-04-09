@@ -10,22 +10,131 @@
 #include "stm32f413h_discovery.h"
 #include "stm32f413h_discovery_ts.h"
 #include "stm32f413h_discovery_lcd.h"
+
 Thread thread;
 WiFiInterface *wifi;
 TS_StateTypeDef  TS_State = {0};
 Serial UART(SERIAL_TX, SERIAL_RX);
 
+int FIRST_TIME_DISPLAY_STATUS = 0;
+int FIRST_TIME_DISPLAY_MODE = 0;
+int FIRST_TIME_DISPLAY_FANSPEED = 0;
+int FIRST_TIME_DISPLAY_WIND_DIRECTION = 0;
+
 int arrivedcount = 0;
 
-void update_temp(uint8_t*  number){
-    BSP_LCD_SetFont(&Font20);
-    BSP_LCD_ClearStringLine(2);
-    BSP_LCD_ClearStringLine(3);
-    BSP_LCD_DisplayStringAtLine(3, (uint8_t*) number);
-    BSP_LCD_DrawCircle(33, 53, 2);
-    BSP_LCD_SetFont(&Font24);
-    BSP_LCD_DisplayStringAt(29, 56, (uint8_t*) " C", LEFT_MODE);
+void clear_screen_first_time(){
+    BSP_LCD_ClearStringLine(6);
+    BSP_LCD_ClearStringLine(7);
+}
 
+void update_power_status(int status, int firsttime){
+    if(firsttime == 0)
+    {
+        BSP_LCD_ClearStringLine(7);
+    }
+
+    BSP_LCD_SetFont(&Font16);
+    BSP_LCD_ClearStringLine(3);
+    if(status == 0){
+        BSP_LCD_SetTextColor(LCD_COLOR_RED);
+        BSP_LCD_DisplayStringAtLine(3,(uint8_t*) "Status : OFF");
+        BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    } else {
+        BSP_LCD_SetTextColor(LCD_COLOR_LIGHTGREEN);
+        BSP_LCD_DisplayStringAtLine(3,(uint8_t*) "Status : ON");
+        BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    }
+    BSP_LCD_SetFont(&Font12);
+    BSP_LCD_ClearStringLine(6);
+
+   
+}
+
+void update_temp(uint8_t*  number){
+    clear_screen_first_time();
+    BSP_LCD_SetFont(&Font16);
+    BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+    BSP_LCD_DisplayStringAtLine(6, (uint8_t*) number);
+    BSP_LCD_DrawCircle(33, 91, 2);
+    BSP_LCD_SetFont(&Font16);
+    BSP_LCD_DisplayStringAt(29, 95, (uint8_t*) " C", LEFT_MODE);
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+}
+
+void update_mode(int mode, int firsttime){
+    
+    if(firsttime == 0){
+        clear_screen_first_time();
+    }
+
+    BSP_LCD_SetFont(&Font16);
+    if(mode == 0){
+        BSP_LCD_ClearStringLine(9);
+        BSP_LCD_DrawHLine(0, 136, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(9, (uint8_t*) "MODE : Auto");
+        BSP_LCD_DrawHLine(0, 163, BSP_LCD_GetXSize());
+    } else if(mode == 1){
+        BSP_LCD_ClearStringLine(9);
+        BSP_LCD_DrawHLine(0, 136, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(9, (uint8_t*) "MODE : Cool");
+        BSP_LCD_DrawHLine(0, 163, BSP_LCD_GetXSize());
+    } else if(mode == 2){
+        BSP_LCD_ClearStringLine(9);
+        BSP_LCD_DrawHLine(0, 136, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(9, (uint8_t*) "MODE : Dry");
+        BSP_LCD_DrawHLine(0, 163, BSP_LCD_GetXSize());
+    }
+}
+
+void update_fanspeed(int mode, int firsttime){
+    BSP_LCD_SetFont(&Font16);
+    BSP_LCD_SetTextColor(LCD_COLOR_LIGHTBLUE);
+    if(mode == 0){
+        BSP_LCD_ClearStringLine(11);
+        BSP_LCD_DrawHLine(0, 170, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(11, (uint8_t*) "FANSPEED : Auto");
+        BSP_LCD_DrawHLine(0, 195, BSP_LCD_GetXSize());
+    } else if(mode == 1){
+        BSP_LCD_ClearStringLine(11);
+        BSP_LCD_DrawHLine(0, 170, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(11, (uint8_t*) "FANSPEED: Low");
+        BSP_LCD_DrawHLine(0, 195, BSP_LCD_GetXSize());
+    } else if(mode == 2){
+        BSP_LCD_ClearStringLine(11);
+        BSP_LCD_DrawHLine(0, 170, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(11, (uint8_t*) "FANSPEED : Medium");
+        BSP_LCD_DrawHLine(0, 195, BSP_LCD_GetXSize());
+    } else if(mode == 3){
+        BSP_LCD_ClearStringLine(11);
+        BSP_LCD_DrawHLine(0, 170, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(11, (uint8_t*) "FANSPEED : High");
+        BSP_LCD_DrawHLine(0, 195, BSP_LCD_GetXSize());
+    } else if(mode == 4){
+        BSP_LCD_ClearStringLine(11);
+        BSP_LCD_DrawHLine(0, 170, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(11, (uint8_t*) "FANSPEED : Turbo");
+        BSP_LCD_DrawHLine(0, 195, BSP_LCD_GetXSize());
+    }
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE); 
+}
+
+void update_wind_direction(int mode, int firsttime){
+
+    BSP_LCD_SetFont(&Font16);
+    BSP_LCD_SetTextColor(LCD_COLOR_RED);
+    if(mode == 0){
+        BSP_LCD_ClearStringLine(13);
+        BSP_LCD_DrawHLine(0, 202, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(13, (uint8_t*) "WIND - DIR : Fix");
+        BSP_LCD_DrawHLine(0, 225, BSP_LCD_GetXSize());
+    } else if(mode == 1){
+        BSP_LCD_ClearStringLine(13);
+        BSP_LCD_DrawHLine(0, 202, BSP_LCD_GetXSize());
+        BSP_LCD_DisplayStringAtLine(13, (uint8_t*) "WIND - DIR: SWING");
+        BSP_LCD_DrawHLine(0, 225, BSP_LCD_GetXSize());
+    }
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE); 
 }
 
 void touchscreen_display(){
@@ -33,16 +142,20 @@ void touchscreen_display(){
 
     /* Set Touchscreen Demo1 description */
     // BSP_LCD_SetTextColor(LCD_COLOR_BLACK);
-    BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), 100); 
+    BSP_LCD_FillRect(0, 0, BSP_LCD_GetXSize(), BSP_LCD_GetYSize()); 
     BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
     BSP_LCD_SetBackColor(LCD_COLOR_BLACK); 
     BSP_LCD_SetFont(&Font16);
     BSP_LCD_DisplayStringAt(0, 15, (uint8_t *)"A/C Simulator", CENTER_MODE);
+    BSP_LCD_DrawHLine(0, 33, BSP_LCD_GetXSize());
+    
+    //STATUS
+    BSP_LCD_SetTextColor(LCD_COLOR_YELLOW);
+    BSP_LCD_DisplayStringAtLine(3,(uint8_t*) " ** Press a button ** ");
+    BSP_LCD_SetTextColor(LCD_COLOR_WHITE);
+    
     BSP_LCD_SetFont(&Font12);
-    BSP_LCD_ClearStringLine(4);
-    BSP_LCD_DisplayStringAtLine(4, (uint8_t*) "TEMP_NOT_SET");
-    // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "TEMP_NOT_SET", LEFT_MODE);
-    // BSP_LCD_DrawCircle(29, 50, 2);
+    
 }
 
 void get_the_payload(char payload[]){
@@ -57,6 +170,7 @@ void get_the_payload(char payload[]){
     //WORD
     char ON[] = "on";
     char OFF[] = "off";
+
     char AUTO[] = "auto";
     char COOL[] = "cool";
     char DRY[] = "dry";
@@ -73,10 +187,19 @@ void get_the_payload(char payload[]){
     char TWENTY_NINE[] = "29";
     char THIRTY[] = "30";
 
+    char FAN_SPEED_AUTO[] = "00";
+    char FAN_SPEED_LOW[] = "01";
+    char FAN_SPEED_MEDIUM[] = "02";
+    char FAN_SPEED_HIGH[] = "03";
+    char FAN_SPEED_TURBO[] = "04";
+
+    char WIN_DIRECTION_FIX[] = "fix";
+    char WIN_DIRECTION_SWING[] = "swing";
 
     //STRSTR_VARABLE
     char *ON_STRSTR;
     char *OFF_STRSTR;
+
     char *AUTO_STRSTR;
     char *COOL_STRSTR;
     char *DRY_STRSTR;
@@ -93,6 +216,10 @@ void get_the_payload(char payload[]){
     char *TWENTY_EIGHT_STRSTR;
     char *TWENTY_NINE_STRSTR;
     char *THIRTY_STRSTR;
+
+    char *FAN_SPEED_AUTO_STRSTR, *FAN_SPEED_LOW_STRSTR, *FAN_SPEED_MEDIUM_STRSTR, *FAN_SPEED_HIGH_STRSTR, *FAN_SPEED_TURBO_STRSTR;
+
+    char *WIN_DIRECTION_FIX_STRSTR, *WIN_DIRECTION_SWING_STRSTR;
 
     //STRSTR
     ON_STRSTR = strstr(payload, ON);
@@ -113,65 +240,67 @@ void get_the_payload(char payload[]){
     TWENTY_NINE_STRSTR = strstr(payload, TWENTY_NINE);
     THIRTY_STRSTR = strstr(payload, THIRTY);
 
+    FAN_SPEED_AUTO_STRSTR = strstr(payload, FAN_SPEED_AUTO);
+    FAN_SPEED_LOW_STRSTR = strstr(payload, FAN_SPEED_LOW);
+    FAN_SPEED_MEDIUM_STRSTR = strstr(payload, FAN_SPEED_MEDIUM);
+    FAN_SPEED_HIGH_STRSTR = strstr(payload, FAN_SPEED_HIGH);
+    FAN_SPEED_TURBO_STRSTR = strstr(payload, FAN_SPEED_TURBO);
+
+    WIN_DIRECTION_FIX_STRSTR = strstr(payload, WIN_DIRECTION_FIX);
+    WIN_DIRECTION_SWING_STRSTR = strstr(payload, WIN_DIRECTION_SWING);
 
     //CHECK_PRESSED_BUTTON
     if(ON_STRSTR){
+        update_power_status(1, FIRST_TIME_DISPLAY_STATUS);
+        FIRST_TIME_DISPLAY_STATUS += 1;
         printf("You press ON\n");
     }
 
     else if(OFF_STRSTR){
+        update_power_status(0, FIRST_TIME_DISPLAY_STATUS);
+        FIRST_TIME_DISPLAY_STATUS += 1;
         printf("You press OFF\n");
     }
 
     else if(AUTO_STRSTR){
+        update_mode(0, FIRST_TIME_DISPLAY_MODE);
+        FIRST_TIME_DISPLAY_MODE += 1;
         printf("You press AUTO\n");
     }
 
     else if(COOL_STRSTR){
+        update_mode(1, FIRST_TIME_DISPLAY_MODE);
+        FIRST_TIME_DISPLAY_MODE += 1;
         printf("You press COOL\n");
     }
 
     else if(DRY_STRSTR){
+        update_mode(2, FIRST_TIME_DISPLAY_MODE);
+        FIRST_TIME_DISPLAY_MODE += 1;
         printf("You press DRY\n");
     }
 
     else if(TWENTY_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_ClearStringLine(4);
-        // BSP_LCD_DisplayStringAtLine(4, (uint8_t*) "20");
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "20");
         printf("You press 20\n");
     }
 
     else if(TWENTY_ONE_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "21 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "21");
         printf("You press 21\n");
     }
 
     else if(TWENTY_TWO_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "22 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "22");
         printf("You press 22\n");
     }
 
     else if(TWENTY_THREE_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "23 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "23");
         printf("You press 23\n");
     }
 
     else if(TWENTY_FOUR_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "24 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "24");
         printf("You press 24\n");
     }
@@ -209,9 +338,6 @@ void get_the_payload(char payload[]){
     }
 
     else if(TWENTY_NINE_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "29");
         printf("You press 29\n");
     }
@@ -222,6 +348,48 @@ void get_the_payload(char payload[]){
         // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "30");
         printf("You press 30\n");
+    }
+
+    else if(FAN_SPEED_AUTO_STRSTR){
+        update_fanspeed(0, FIRST_TIME_DISPLAY_FANSPEED);
+        FIRST_TIME_DISPLAY_FANSPEED += 1;
+        printf("You press FAN SPEED Auto\n");
+    }
+
+    else if(FAN_SPEED_LOW_STRSTR){
+        update_fanspeed(1, FIRST_TIME_DISPLAY_FANSPEED);
+        FIRST_TIME_DISPLAY_FANSPEED += 1;
+        printf("You press FAN SPEED Low\n");
+    }
+
+    else if(FAN_SPEED_MEDIUM_STRSTR){
+        update_fanspeed(2, FIRST_TIME_DISPLAY_FANSPEED);
+        FIRST_TIME_DISPLAY_FANSPEED += 1;
+        printf("You press FAN SPEED Medium\n");
+    }
+
+    else if(FAN_SPEED_HIGH_STRSTR){
+        update_fanspeed(3, FIRST_TIME_DISPLAY_FANSPEED);
+        FIRST_TIME_DISPLAY_FANSPEED += 1;
+        printf("You press FAN SPEED High\n");
+    }
+
+    else if(FAN_SPEED_TURBO_STRSTR){
+        update_fanspeed(4, FIRST_TIME_DISPLAY_FANSPEED);
+        FIRST_TIME_DISPLAY_FANSPEED += 1;
+        printf("You press FAN SPEED Turbo\n");
+    } 
+    
+    else if(WIN_DIRECTION_FIX_STRSTR){
+        update_wind_direction(0, FIRST_TIME_DISPLAY_WIND_DIRECTION);
+        FIRST_TIME_DISPLAY_WIND_DIRECTION += 1;
+        printf("You press WIND Direction Fix\n");
+    }
+
+    else if(WIN_DIRECTION_SWING_STRSTR){
+        update_wind_direction(1, FIRST_TIME_DISPLAY_WIND_DIRECTION);
+        FIRST_TIME_DISPLAY_WIND_DIRECTION += 1;
+        printf("You press WIND Direction Swing\n");
     }
 
     else {
@@ -250,7 +418,7 @@ int main()
     //DISPLAY_SHOW
     thread.start(touchscreen_display);
 
-    int count = 0;
+    int firsttime = 0;
     char* topic = "/Final";
 
     printf("WiFi MQTT example\n");
@@ -327,8 +495,8 @@ int main()
     message.retained = false;
     message.dup = false;
 
-    while(1){
-        client.yield(20000); 
+    while(true){
+        client.yield(30000); 
     }
     
     printf("[Subscribe] Finishing with %d messages received\n", arrivedcount);
