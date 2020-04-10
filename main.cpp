@@ -306,33 +306,21 @@ void get_the_payload(char payload[]){
     }
 
     else if(TWENTY_FIVE_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "25 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "25");
         printf("You press 25\n");
     }
 
     else if(TWENTY_SIX_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "26 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "26");
         printf("You press 26\n");
     }
 
     else if(TWENTY_SEVEN_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "27");
         printf("You press 27\n");
     }
 
     else if(TWENTY_EIGHT_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "28");
         printf("You press 28\n");
     }
@@ -343,9 +331,6 @@ void get_the_payload(char payload[]){
     }
 
     else if(THIRTY_STRSTR){
-        // BSP_LCD_SetFont(&Font16);
-        // BSP_LCD_DisplayStringAt(0, 50, (uint8_t*) "27 C", LEFT_MODE);
-        // BSP_LCD_DrawCircle(29, 50, 2);
         update_temp((uint8_t *) "30");
         printf("You press 30\n");
     }
@@ -468,7 +453,7 @@ int main()
     data.username.cstring = "";
     data.password.cstring = "";
 
-    // printf("RC_1 : %d\n", rc);
+
     if ((rc = client.connect(data)) != 0)
     {
         printf("[Subscribe]rc from MQTT connect is %d\r\n", rc);
@@ -478,8 +463,6 @@ int main()
         printf("[Subscribe] Client Connected.\r\n");
     }
 
-    
-    // printf("RC_2 : %d\n", rc);   
     if ((rc = client.subscribe(topic, MQTT::QOS0, subscribeCallback)) != 0)
     {
         printf("[Subscribe] rc from MQTT subscribe is %d\r\n", rc);
@@ -495,8 +478,11 @@ int main()
     message.retained = false;
     message.dup = false;
 
+    int test_subscribe = 0;
     while(true){
-        client.yield(30000); 
+        client.yield(10000);
+        printf("Test subscribe :: %d\n", test_subscribe);
+        test_subscribe += 1; 
     }
     
     printf("[Subscribe] Finishing with %d messages received\n", arrivedcount);
